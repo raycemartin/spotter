@@ -24,14 +24,14 @@ while cv2.waitKey(1) != 27: #Escape
     frame = cv2.flip(frame, 0)
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     
-    left_img = gray[:,:int(gray.shape[1]/2)]
-    right_img = gray[:,int(gray.shape[1]/2):]
+    right_img = gray[:,:int(gray.shape[1]/2)]
+    left_img = gray[:,int(gray.shape[1]/2):]
     
-    stereo = cv2.StereoBM_create(numDisparities=32, blockSize=15)
+    stereo = cv2.StereoBM_create(numDisparities=16, blockSize=31)
     disparity = stereo.compute(left_img, right_img)
     cv2.imshow('Disparity', disparity)
-    # cv2.imshow('Left',left_img)
-    # cv2.imshow('Right',right_img)
+    # cv2.imshow('Left', left_img)
+    # cv2.imshow('Right', right_img)
     # cv2.imshow('Original',frame)
 source.release()
 cv2.destroyAllWindows() 
