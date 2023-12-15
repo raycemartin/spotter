@@ -25,7 +25,7 @@ class Camera:
         
     def calibrate(self):
         ### Calibration ###   
-        
+        current_directory = os.getcwd()
         
         size_of_target = (7*5, 3)
         
@@ -40,7 +40,7 @@ class Camera:
         objpoints = [] # 3d points in real space
         imgpoints = [] # 2d points in real space
         
-        images = glob.glob('*/*.png')
+        images = glob.glob(str(current_directory) + '/calibration_images/' + self.name + '_camera/*.png')
         
         for fname in images:
             
@@ -116,8 +116,8 @@ def take_images():
 # dst = dst[y:y+h, x:x+w]
 # cv2.imwrite('calibration.png', dst)
 
-left_camera = Camera('Left')
-right_camera = Camera('Right')
+left_camera = Camera('left')
+right_camera = Camera('right')
 
 left_camera.calibrate()
 right_camera.calibrate()
@@ -139,3 +139,13 @@ retS, new_mtxL, distL, new_mtxR, distR, Rot, Trns, Emat, Fmat = cv2.stereoCalibr
                                                                                     gray.shape[::-1], 
                                                                                     criteria_stereo, 
                                                                                     flags)
+
+rectify_scale= 1
+rect_l, rect_r, proj_mat_l, proj_mat_r, Q, roiL, roiR= cv2.stereoRectify(new_mtxL, 
+                                                                         distL, 
+                                                                         new_mtxR, 
+                                                                         distR, 
+                                                                         gray.shape[::-1], 
+                                                                         Rot, 
+                                                                         Trns, 
+                                                                         rectify_scale,(0,0))
