@@ -16,7 +16,11 @@ import glob
 class Camera:
     def __init__(self, name):
         self.name = name
-        self.camera_params = []
+        self.camera_matrix = []
+        self.roi = ()
+        self.dist = []
+        self.objpoints = []
+        self.imgpoints = []
         
         
     def calibrate(self):
@@ -60,9 +64,11 @@ class Camera:
                 cv2.waitKey(500)
         
         cv2.destroyAllWindows()
-        self.camera_params = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
- 
-
+        ret, mtx, self.dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
+        h, w = img.shape[:2]
+        self.camera_matrix, self.roi = cv2.getOptimalNewCameraMatrix(mtx, self.dist, (w,h), 1, (w,h))
+        self.objpoints = objpoints
+        self.imgpoints = imgpoints
 
 
 def take_images():
@@ -109,3 +115,27 @@ def take_images():
 # x,y,w,h = roi
 # dst = dst[y:y+h, x:x+w]
 # cv2.imwrite('calibration.png', dst)
+
+left_camera = Camera('Left')
+right_camera = Camera('Right')
+
+left_camera.calibrate()
+right_camera.calibrate()
+
+flags = 0
+flags |= cv2.CALIB_FIX_INTRINSIC
+# Here we fix the intrinsic camara matrixes so that only Rot, Trns, Emat and Fmat are calculated.
+# Hence intrinsic parameters are the same 
+gray = np.zeros((960, 1280))
+criteria_stereo= (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+# This step is performed to transformation between the two cameras and calculate Essential and Fundamenatl matrix
+retS, new_mtxL, distL, new_mtxR, distR, Rot, Trns, Emat, Fmat = cv2.stereoCalibrate(left_camera.objpoints, 
+                                                                                    left_camera.imgpoints, 
+                                                                                    right_camera.imgpoints, 
+                                                                                    left_camera.camera_matrix, 
+                                                                                    left_camera.dist, 
+                                                                                    right_camera.camera_matrix, 
+                                                                                    right_camera.dist, 
+                                                                                    gray.shape[::-1], 
+                                                                                    criteria_stereo, 
+                                                                                    flags)
