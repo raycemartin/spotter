@@ -1,1 +1,3 @@
-# bar-tracking
+# Spotter
+
+## Description
