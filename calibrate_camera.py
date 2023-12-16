@@ -149,3 +149,16 @@ rect_l, rect_r, proj_mat_l, proj_mat_r, Q, roiL, roiR= cv2.stereoRectify(new_mtx
                                                                          Rot, 
                                                                          Trns, 
                                                                          rectify_scale,(0,0))
+
+Left_Stereo_Map= cv2.initUndistortRectifyMap(new_mtxL, distL, rect_l, proj_mat_l,
+                                             gray.shape[::-1], cv2.CV_16SC2)
+Right_Stereo_Map= cv2.initUndistortRectifyMap(new_mtxR, distR, rect_r, proj_mat_r,
+                                              gray.shape[::-1], cv2.CV_16SC2)
+ 
+print("Saving paraeters ......")
+cv_file = cv2.FileStorage("improved_params2.xml", cv2.FILE_STORAGE_WRITE)
+cv_file.write("Left_Stereo_Map_x",Left_Stereo_Map[0])
+cv_file.write("Left_Stereo_Map_y",Left_Stereo_Map[1])
+cv_file.write("Right_Stereo_Map_x",Right_Stereo_Map[0])
+cv_file.write("Right_Stereo_Map_y",Right_Stereo_Map[1])
+cv_file.release()
