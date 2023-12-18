@@ -29,9 +29,9 @@ while cv2.waitKey(1) != 27: #Escape
     
     stereo = cv2.StereoBM_create(numDisparities=16, blockSize=31)
     disparity = stereo.compute(left_img, right_img)
-    cv2.imshow('Disparity', disparity)
+    # cv2.imshow('Disparity', disparity)
     # cv2.imshow('Left', left_img)
-    # cv2.imshow('Right', right_img)
+    cv2.imshow('Right', right_img)
     # cv2.imshow('Original',frame)
 source.release()
 cv2.destroyAllWindows() 
