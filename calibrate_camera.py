@@ -16,6 +16,7 @@ import glob
 class Camera:
     def __init__(self, name):
         self.name = name
+        self.camera_params = []
         self.camera_matrix = []
         self.roi = ()
         self.dist = []
@@ -64,22 +65,20 @@ class Camera:
                 cv2.waitKey(500)
         
         cv2.destroyAllWindows()
-        ret, mtx, self.dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
+        self.camera_params = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None) # ret, mtx, dist, rvecs, tvecs
         h, w = img.shape[:2]
-        self.camera_matrix, self.roi = cv2.getOptimalNewCameraMatrix(mtx, self.dist, (w,h), 1, (w,h))
+        self.camera_matrix, self.roi = cv2.getOptimalNewCameraMatrix(self.camera_params[1], self.camera_params[2], (w,h), 1, (w,h))
         self.objpoints = objpoints
         self.imgpoints = imgpoints
     
-    def undistort():
-        # img = cv2.imread(r'calibration_images/cal_left_img_12.png')
-        # h, w = img.shape[:2]
-        # newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w,h), 1, (w,h))
+    def undistort(self, img):
+        h, w = img.shape[:2]
 
-        # dst = cv2.undistort(img, mtx, dist, None, newcameramtx)
+        undstorted = cv2.undistort(img, self.camera_params[1], self.camera_params[2], None, self.camera_matrix)
 
-        # x,y,w,h = roi
-        # dst = dst[y:y+h, x:x+w]
-        # cv2.imwrite('calibration.png', dst)
+        x,y,w,h = self.roi
+        undstorted = undstorted[y:y+h, x:x+w]
+        cv2.imshow('Undistorted Image', undstorted)
 
 def take_images():
     current_directory = os.getcwd()
@@ -153,7 +152,7 @@ def stereo_rect():
     cv_file.write("Right_Stereo_Map_x",Right_Stereo_Map[0])
     cv_file.write("Right_Stereo_Map_y",Right_Stereo_Map[1])
     cv_file.release()
-
+    print("Done")
 # ret, mtx, dist, rvecs, tvecs = calibrate()
 
 
