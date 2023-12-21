@@ -123,9 +123,9 @@ def stereo_rect():
                                                                                         left_camera.imgpoints, 
                                                                                         right_camera.imgpoints, 
                                                                                         left_camera.camera_matrix, 
-                                                                                        left_camera.dist, 
+                                                                                        left_camera.camera_params[2], 
                                                                                         right_camera.camera_matrix, 
-                                                                                        right_camera.dist, 
+                                                                                        right_camera.camera_params[2], 
                                                                                         gray.shape[::-1], 
                                                                                         criteria_stereo, 
                                                                                         flags)
@@ -153,7 +153,30 @@ def stereo_rect():
     cv_file.write("Right_Stereo_Map_y",Right_Stereo_Map[1])
     cv_file.release()
     print("Done")
+    
+    
+    imgL = cv2.imread(r'calibration_images/left_camera/cal_left_img_20.png')
+    imgR = cv2.imread(r'calibration_images/right_camera/cal_right_img_20.png')
+    
+    cv2.imshow("Left image before rectification", imgL)
+    cv2.imshow("Right image before rectification", imgR)
+     
+    Left_nice= cv2.remap(imgL,Left_Stereo_Map[0],Left_Stereo_Map[1], cv2.INTER_LANCZOS4, cv2.BORDER_CONSTANT, 0)
+    Right_nice= cv2.remap(imgR,Right_Stereo_Map[0],Right_Stereo_Map[1], cv2.INTER_LANCZOS4, cv2.BORDER_CONSTANT, 0)
+     
+    cv2.imshow("Left image after rectification", Left_nice)
+    cv2.imshow("Right image after rectification", Right_nice)
+    # cv2.waitKey(0)
+     
+    out = Right_nice.copy()
+    out[:,:,0] = Right_nice[:,:,0]
+    out[:,:,1] = Right_nice[:,:,1]
+    out[:,:,2] = Left_nice[:,:,2]
+     
+    cv2.imshow("Output image", out)
+    # cv2.waitKey(0)
 # ret, mtx, dist, rvecs, tvecs = calibrate()
+
 
 
 
@@ -165,3 +188,4 @@ if __name__ == '__main__':
     # take_images()
     left_camera.calibrate()
     right_camera.calibrate()
+    stereo_rect()
